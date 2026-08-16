@@ -72,6 +72,14 @@ Invariant 4 is a guarantee about the field's semantics, not about what a verifie
 
 (2026-08-14, credit: Henri Sirkkavaara / draft-sirkkavaara-vaara-receipt, scitt@ietf.org thread on draft-fassbender-scitt-time-anchor-03 — the same absent-vs-unverified distinction argued there for time-anchor receipts applies directly to negotiation_ref.)
 
+**5a. `"absent"` is a ran-and-failed finding**
+
+The unreached / ran-and-failed partition below applies to `negotiation_linkage` as well, and the two fields MUST agree. `"absent"` says the record was read and declared no `negotiation_ref`. Where the record was never obtained — `trail_not_found` — nothing was observed about the field, and the verifier MUST report `null` rather than `"absent"`. Reporting `"absent"` there puts both categories in one value, in the same result whose `reason` keeps them apart.
+
+`"present"` is decided by "the field was supplied", not by truthiness — an empty or malformed `negotiation_ref` was still supplied, and validating it is out of scope (invariant 3).
+
+(2026-08-16, credit: Aleksei Chirkunov — `negotiation_linkage` was computed before the walk, on the raw `get_trail_by_id()` result, so a missing trail returned `reason: "trail_not_found"` with `negotiation_linkage: "absent"`.)
+
 ---
 
 ## `verify_chain()` — `reason` partition: unreached vs. ran-and-failed

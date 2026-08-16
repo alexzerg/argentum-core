@@ -64,10 +64,30 @@ def test_negotiation_linkage_present_but_unverified_by_construction(db):
     assert result["negotiation_linkage"] == "present"
 
 
-def test_negotiation_linkage_present_on_broken_chain(db):
-    """La distinción sobrevive incluso cuando la cadena falla por otra razón --
-    negotiation_linkage no depende del resultado de valid."""
-    result = mycelium_trails.verify_chain(db, "trail-id-que-no-existe")
+def test_negotiation_linkage_survives_broken_chain(db):
+    """Linkage doesn't depend on valid: the broken link here is the parent, but
+    trail_id itself was read, so reporting "absent" is legitimate."""
+    trail_id = mycelium_trails.record_trail(
+        db, "agent-linkage-test", "oasis", "enter", uuid.uuid4().hex, karma_at_time=10,
+        parent_trail_id="parent-does-not-exist",
+    )
+    result = mycelium_trails.verify_chain(db, trail_id)
     assert result["valid"] is False
     assert result["reason"] == "trail_not_found"
     assert result["negotiation_linkage"] == "absent"
+
+
+def test_negotiation_linkage_none_when_record_never_read(db):
+    """Unreached branch: with no record there is nothing the field was absent from."""
+    result = mycelium_trails.verify_chain(db, "trail-id-does-not-exist")
+    assert result["reason"] == "trail_not_found"
+    assert result["negotiation_linkage"] is None
+
+
+def test_negotiation_linkage_present_when_ref_is_empty_string(db):
+    """An empty ref was still supplied: malformed, but not "absent"."""
+    trail_id = mycelium_trails.record_trail(
+        db, "agent-linkage-test", "oasis", "enter", uuid.uuid4().hex, karma_at_time=10,
+        negotiation_ref="",
+    )
+    assert mycelium_trails.verify_chain(db, trail_id)["negotiation_linkage"] == "present"

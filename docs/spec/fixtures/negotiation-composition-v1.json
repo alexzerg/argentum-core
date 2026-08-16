@@ -162,6 +162,28 @@
         "credit": "Same distinction motivated by Henri Sirkkavaara (scitt@ietf.org, 2026-08-14/16) as negotiation-003-absent above — this vector is the present-but-unverified half of the pair he asked for, proving 'present' is not a verification claim.",
         "why_this_field": "no negotiation_artifact is given for this vector deliberately — the point is that negotiation_ref does not need one to be accepted and reported as \"present\"; supplying a real artifact here would undercut the vector's purpose."
       }
+    },
+    {
+      "id": "negotiation-005-linkage-unknown-record-not-read",
+      "description": "The unreached row of the reason partition: the verifier is asked about a trail_id that is not in the store, get_trail_by_id() returns None, and nothing is read. negotiation_linkage MUST be null, not \"absent\" — \"absent\" is a ran-and-failed finding (record read, no negotiation_ref declared), and the two MUST NOT share a value in a result whose reason keeps them apart. See invariant 5a.",
+      "record_supplied": false,
+      "negotiation_artifact": null,
+      "query": {
+        "trail_id": "trail-id-not-in-store"
+      },
+      "query_jcs_payload": "{\"query\":{\"trail_id\":\"trail-id-not-in-store\"},\"record_supplied\":false}",
+      "query_canonical_bytes_hex": "7b227175657279223a7b22747261696c5f6964223a22747261696c2d69642d6e6f742d696e2d73746f7265227d2c227265636f72645f737570706c696564223a66616c73657d",
+      "query_canonical_sha256": "d8c21d94812c15f2052e6968199eb32f3759da1a9ded6731631a6fc2f63cc1e5",
+      "expected_reason_class": "unreached",
+      "expected_negotiation_linkage": null,
+      "expected_verify_result": {
+        "reason": "trail_not_found",
+        "valid": false
+      },
+      "notes": {
+        "credit": "Aleksei Chirkunov, 2026-08-16 — verify_chain() returned \"absent\" here.",
+        "shape": "No envelope on purpose: the condition is the absence of a document, so the query is what gets canonicalized. Still recomputable without importing an implementation."
+      }
     }
   ]
 }

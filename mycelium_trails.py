@@ -523,6 +523,8 @@ def verify_chain(db_path: str, trail_id: str) -> dict:
     negotiation-ref.md invariante 3 — el estado es "presente sin verificar", no "verificado").
     Sin este campo la distinción vive solo en la spec, no sobrevive a quien lee el resultado.
 
+    None = not established: the record was never read (unreached branch, below).
+
     Retorna: { valid: bool, broken_at: trail_id | None, reason: str | None,
                negotiation_linkage: "absent" | "present" | None }
 
@@ -549,7 +551,10 @@ def verify_chain(db_path: str, trail_id: str) -> dict:
     Detalle y tabla completa: docs/spec/negotiation-ref.md.
     """
     target = get_trail_by_id(db_path, trail_id)
-    negotiation_linkage = "present" if (target and target.get("negotiation_ref")) else "absent"
+    if target is None:
+        negotiation_linkage = None
+    else:
+        negotiation_linkage = "present" if target.get("negotiation_ref") is not None else "absent"
 
     visited = set()
     current_id = trail_id
